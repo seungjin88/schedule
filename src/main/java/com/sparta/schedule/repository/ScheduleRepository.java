@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 @Repository
@@ -77,7 +78,33 @@ public class ScheduleRepository {
 
         return jdbcTemplate.query(sql.toString(),new ScheduleRowMapper(),params.toArray());
     }
+    public Schedule update(Schedule schedule) {
+        String sql = "UPDATE schedule SET task = ?, name = ?, modDate = ? WHERE id = ?";
+        LocalDateTime currentTime = LocalDateTime.now();
+        jdbcTemplate.update(sql, schedule.getTask(), schedule.getName(), currentTime, schedule.getId());
+        return Schedule.builder()
+                .id(schedule.getId())
+                .task(schedule.getTask())
+                .name(schedule.getName())
+                .regDate(currentTime)
+                .modDate(currentTime)
+                .build();
+    }
 
+    public int deleteById(Long id) {
+        String sql = "DELETE FROM schedule WHERE id=?";
+        return jdbcTemplate.update(sql,id);
+    }
+
+    public List<Schedule> findAll() {
+        String sql = "SELECT * FROM schedule";
+        try{
+            return jdbcTemplate.query(sql, new ScheduleRowMapper());
+        }
+        catch (EmptyResultDataAccessException e) {
+            throw new NoSuchElementException("일정이 없습니다.");
+        }
+    }
 
         private static class ScheduleRowMapper implements RowMapper<Schedule> {
             @Override
