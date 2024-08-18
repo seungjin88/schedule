@@ -1,6 +1,7 @@
 package com.sparta.schedule.Service;
 
 import com.sparta.schedule.dto.ScheduleRequestDto;
+import com.sparta.schedule.dto.ScheduleResponseDto;
 import com.sparta.schedule.entity.Schedule;
 import com.sparta.schedule.repository.ScheduleRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,5 +20,11 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .password(scheduleRequestDto.getPassword())
                 .build();
         return scheduleRepository.createSchedule(schedule);
+    }
+
+    @Override
+    public ScheduleResponseDto getSchedule(Long id) {
+        Schedule schedule = scheduleRepository.findById(id);
+        return ScheduleResponseDto.from(schedule);
     }
 }
